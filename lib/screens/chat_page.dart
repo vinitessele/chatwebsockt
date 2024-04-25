@@ -4,7 +4,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_client/web_socket_client.dart';
+import 'package:web_socket_channel/io.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key, required this.name});
@@ -19,7 +21,9 @@ class _ChatPageState extends State<ChatPage> {
   // final socket = WebSocket(Uri.parse('ws://localhost:8080')); // if run on Windows/Web
   // final socket = WebSocket(Uri.parse('ws://0.tcp.ap.ngrok.io:17306')); // If use ngrok
   //final socket = WebSocket(Uri.parse('ws://10.0.2.2:8080')); // If using emulator
-  final socket = WebSocket(Uri.parse('ws://echo.websocket.org')); // If using emulator
+  
+  final socket = WebSocket(Uri.parse('ws://localhost:8765')); // If using emulator
+
   final List<types.Message> _messages = [];
   late types.User otherUser;
   late types.User me;
@@ -43,9 +47,9 @@ class _ChatPageState extends State<ChatPage> {
       String msg = data['msg'];
       String timestamp = data['timestamp'];
 
-      // if (id == otherUser.id) {
+      if (id == otherUser.id) {
       onMessageReceived(msg);
-      // }
+       }
     });
   }
 
