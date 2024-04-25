@@ -9,20 +9,19 @@ import 'package:web_socket_client/web_socket_client.dart';
 import 'package:web_socket_channel/io.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({super.key, required this.name});
+  const ChatPage({Key? key, required this.name, required this.id})
+      : super(key: key);
 
   final String name;
+  final String id;
 
   @override
   State<ChatPage> createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
-  // final socket = WebSocket(Uri.parse('ws://localhost:8080')); // if run on Windows/Web
-  // final socket = WebSocket(Uri.parse('ws://0.tcp.ap.ngrok.io:17306')); // If use ngrok
-  //final socket = WebSocket(Uri.parse('ws://10.0.2.2:8080')); // If using emulator
-  
-  final socket = WebSocket(Uri.parse('ws://localhost:8765')); // If using emulator
+  final socket =
+      WebSocket(Uri.parse('ws://localhost:8765')); // If using emulator
 
   final List<types.Message> _messages = [];
   late types.User otherUser;
@@ -31,8 +30,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    otherUser = types.User(id: widget.name, firstName: widget.name);
-    me = const types.User(id: 'vini', firstName: 'vini');
+    me = types.User(id: widget.id, firstName: widget.id);
     // Listen to messages from the server.
     socket.messages.listen((incomingMessage) {
       // Split the response into the JSON string and the "from" string
@@ -47,9 +45,10 @@ class _ChatPageState extends State<ChatPage> {
       String msg = data['msg'];
       String timestamp = data['timestamp'];
 
-      if (id == otherUser.id) {
-      onMessageReceived(msg);
-       }
+      if (id != me.id) {
+        otherUser = types.User(id: id, firstName: id);
+        onMessageReceived(msg);
+      }
     });
   }
 
@@ -81,6 +80,9 @@ class _ChatPageState extends State<ChatPage> {
       createdAt: DateTime.now().millisecondsSinceEpoch,
       id: randomString(),
       text: message.text,
+      metadata: {
+        'senderName': me.firstName,
+      },
     );
 
     var payload = {
@@ -98,7 +100,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat with ${widget.name}'),
+        title: Text('ID ${widget.id} NickName ${widget.name}'),
       ),
       body: Chat(
         messages: _messages,

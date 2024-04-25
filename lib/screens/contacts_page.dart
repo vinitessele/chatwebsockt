@@ -1,84 +1,77 @@
-import 'package:app_chat/screens/chat_page.dart';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'chat_page.dart'; 
 
 class ContactsPage extends StatefulWidget {
-  const ContactsPage({super.key});
+  const ContactsPage({Key? key}) : super(key: key);
 
   @override
   State<ContactsPage> createState() => _ContactsPageState();
 }
 
 class _ContactsPageState extends State<ContactsPage> {
-  List<String> contacts = [];
+  String id = '';
+  String nickname = '';
+
+  @override
+  void initState() {
+    super.initState();
+    generateRandomId();
+  }
+
+  void generateRandomId() {
+    final random = Random();
+    final randomNumber = random.nextInt(900000) + 100000; // Gera um número aleatório de 6 dígitos
+    setState(() {
+      id = randomNumber.toString();
+    });
+  }
+
+  void openChatPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ChatPage(name: nickname, id: id),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Contatos'),
+        title: const Text('Contacts'),
       ),
-      body: ListView.builder(
-        itemCount: contacts.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            leading: CircleAvatar(
-              child: Text(contacts[index][0]),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'ID: $id',
+              style: const TextStyle(fontSize: 18),
             ),
-            title: Text(contacts[index]),
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) {
-                return ChatPage(
-                  name: contacts[index],
-                );
-              }));
-            },
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          showModalBottomSheet(
-            isScrollControlled: true,
-            context: context,
-            builder: (_) {
-              final nameController = TextEditingController();
-              return Padding(
-                padding: EdgeInsets.fromLTRB(
-                    8, 8, 8, MediaQuery.of(context).viewInsets.bottom),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nome',
-                      ),
-                    ),
-                    TextField(
-                      controller: nameController,
-                      decoration: const InputDecoration(
-                          labelText: 'ID', hintText: 'Seu ID único'),
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton.icon(
-                        onPressed: () {
-                          if (nameController.text.isEmpty) {
-                            return;
-                          }
-                          setState(() {
-                            contacts.add(nameController.text);
-                          });
-                          Navigator.pop(context);
-                        },
-                        icon: const Icon(Icons.add),
-                        label: const Text('Add'))
-                  ],
-                ),
-              );
-            },
-          );
-        },
-        label: const Text('Envia'),
-        icon: const Icon(Icons.message_outlined),
+            const SizedBox(height: 16),
+            TextField(
+              onChanged: (value) {
+                setState(() {
+                  nickname = value;
+                });
+              },
+              decoration: const InputDecoration(
+                labelText: 'Nickname',
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                openChatPage(context);
+              },
+              child: const Text('Open Chat'),
+            ),
+          ],
+        ),
       ),
     );
   }
