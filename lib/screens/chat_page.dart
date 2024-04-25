@@ -64,6 +64,9 @@ class _ChatPageState extends State<ChatPage> {
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       text: message,
       createdAt: DateTime.now().millisecondsSinceEpoch,
+         metadata: {
+      'senderName': otherUser.firstName,
+    },
     );
     _addMessage(newMessage);
   }
@@ -88,6 +91,7 @@ class _ChatPageState extends State<ChatPage> {
     var payload = {
       'id': me.id,
       'msg': message.text,
+      'nick': me.firstName,
       'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
     };
 
